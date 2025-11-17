@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_methods', function (Blueprint $table) {
+        Schema::create('order_payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');   
-            $table->string('icon')->default('fa-money-bill-wave');
-            $table->boolean('active')->default(true);
+            $table->foreignId('order_id');
+            $table->foreignId('payment_method_id');
+            $table->decimal('amount', 8, 4);
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_methods');
+        Schema::dropIfExists('order_payment_methods');
     }
 };

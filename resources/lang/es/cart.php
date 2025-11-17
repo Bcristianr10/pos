@@ -35,6 +35,8 @@ return [
     'product_name'      => 'Nombre del Producto',
     'quantity'          => 'Cantidad',
     'price'             => 'Precio',
+    'sub_total'         => 'Subtotal',
+    'tax'               => 'Impuesto',
     'total'             => 'Total',
     'cancel'            => 'Cancelar',
     'checkout'          => 'Pagar',
@@ -42,5 +44,6 @@ return [
     'amount'            => 'Monto',
     'cashBack'          => 'Devolución',
     'amountReceived'    => 'Monto recibido',
+    'balance'           => 'Saldo',
 
 ];

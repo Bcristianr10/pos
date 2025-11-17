@@ -49,6 +49,14 @@ class OrderController extends Controller
             $item->quantity = $item->quantity - $item->pivot->quantity;
             $item->save();
         }
+        $paymentMethods = $request->payment_methods;        
+        foreach ($paymentMethods as $key =>$paymentMethod) {            
+            $order->paymentMethods()->create([
+                'payment_method_id' => $key,
+                'amount' => $paymentMethod['amountPayed'],
+            ]);
+        }
+
         $request->user()->cart()->detach();
         $order->payments()->create([
             'amount' => $request->amount,

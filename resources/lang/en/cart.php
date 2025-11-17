@@ -44,5 +44,6 @@ return [
     'amount'            => 'Amount',
     'cashBack'          => 'Cash Back',
     'amountReceived'    => 'Amount Received',
+    'balance'           => 'Balance',
 
 ];

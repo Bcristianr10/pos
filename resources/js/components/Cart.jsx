@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { sum } from "lodash";
-import PaymenthMethodModal from "./PaymenthMethodModal";
+import PaymentMethodModal from "./PaymentMethodModal";
 let totalData = {};
 
 class Cart extends Component {
@@ -29,7 +29,7 @@ class Cart extends Component {
         this.handleChangeSearch = this.handleChangeSearch.bind(this);
         this.handleSeach = this.handleSeach.bind(this);
         this.setCustomerId = this.setCustomerId.bind(this);
-        this.handleClickSubmit = this.handleClickSubmit.bind(this);
+        // this.handleClickSubmit = this.handleClickSubmit.bind(this);
         this.loadTranslations = this.loadTranslations.bind(this);
     }
 
@@ -210,36 +210,36 @@ class Cart extends Component {
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
     }
-    handleClickSubmit() {
-        Swal.fire({
-            title: this.state.translations["received_amount"],
-            input: "text",
-            inputValue: this.getTotal(this.state.cart),
-            cancelButtonText: this.state.translations["cancel_pay"],
-            showCancelButton: true,
-            confirmButtonText: this.state.translations["confirm_pay"],
-            showLoaderOnConfirm: true,
-            preConfirm: (amount) => {
-                return axios
-                    .post("/admin/orders", {
-                        customer_id: this.state.customer_id,
-                        amount,
-                    })
-                    .then((res) => {
-                        this.loadCart();
-                        return res.data;
-                    })
-                    .catch((err) => {
-                        Swal.showValidationMessage(err.response.data.message);
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
-        }).then((result) => {
-            if (result.value) {
-                //
-            }
-        });
-    }
+    // handleClickSubmit() {
+    //     // Swal.fire({
+    //     //     title: this.state.translations["received_amount"],
+    //     //     input: "text",
+    //     //     inputValue: this.getTotal(this.state.cart),
+    //     //     cancelButtonText: this.state.translations["cancel_pay"],
+    //     //     showCancelButton: true,
+    //     //     confirmButtonText: this.state.translations["confirm_pay"],
+    //     //     showLoaderOnConfirm: true,
+    //     //     preConfirm: (amount) => {
+    //     //         return axios
+    //     //             .post("/admin/orders", {
+    //     //                 customer_id: this.state.customer_id,
+    //     //                 amount,
+    //     //             })
+    //     //             .then((res) => {
+    //     //                 this.loadCart();
+    //     //                 return res.data;
+    //     //             })
+    //     //             .catch((err) => {
+    //     //                 Swal.showValidationMessage(err.response.data.message);
+    //     //             });
+    //     //     },
+    //     //     allowOutsideClick: () => !Swal.isLoading(),
+    //     // }).then((result) => {
+    //     //     if (result.value) {
+    //     //         //
+    //     //     }
+    //     // });
+    // }
     render() {
         const { cart, products, customers, barcode, translations } = this.state;
         this.getTotal(cart);
@@ -374,10 +374,11 @@ class Cart extends Component {
                                 {translations["cancel"]}
                             </button>
                         </div>
-                        <PaymenthMethodModal
+                        <PaymentMethodModal
                             translations={translations}
-                            cart={this.state.cart}
+                            state={this.state}
                             totalData={totalData}
+                            loadCart={this.loadCart}
                         />
                     </div>
                 </div>
