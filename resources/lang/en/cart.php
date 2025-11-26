@@ -30,6 +30,7 @@ return [
     'scan_barcode'      => 'Scan Barcode...',
     'received_amount'   => 'Received Amount',
     'confirm_pay'       => 'Receive',
+    'confirm_pay_no'    => 'Receive wp',
     'cancel_pay'        => 'Cancel',
     'general_customer'  => 'General Customer',
     'product_name'      => 'Product Name',

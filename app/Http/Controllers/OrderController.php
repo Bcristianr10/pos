@@ -64,7 +64,9 @@ class OrderController extends Controller
             'amount' => $request->amount,
             'user_id' => $request->user()->id,
         ]);
-        $this->finalyTicket($order);
+        if($request->print_fe) {
+            $this->finalyTicket($order);
+        }
         return 'success';
     }
     public function partialPayment(Request $request)

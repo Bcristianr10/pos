@@ -2,15 +2,23 @@
 
 namespace App\Print;
 
+use App\Models\Setting;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 
 trait PrintTicketTrait
-{
+{    
+    public function getInfoBussiness()
+    {
+        $settings = Setting::get();
+        return $settings;
+    }
+
     public function finalyTicket($order)
     {
         try {
-            $connector = new WindowsPrintConnector("POS-58");
+            $settings = $this->getInfoBussiness();
+            $connector = new WindowsPrintConnector($settings->bussiness_printer);
             $printer   = new Printer($connector);
 
             // ==========================================
@@ -19,11 +27,11 @@ trait PrintTicketTrait
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setEmphasis(true);
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-            $printer->text("MI NEGOCIO S.A.\n");
+            $printer->text($settings->bussiness_name . "\n");
             $printer->selectPrintMode();
-            $printer->text("RUC: 155432-1-123456 DV 45\n");
-            $printer->text("Av. Central, Local #12, Ciudad de Panamá\n");
-            $printer->text("Tel: 394-0000  |  info@minegocio.com\n");
+            $printer->text("RUC: " . $settings->business_ruc . " DV " . $settings->business_dv . "\n");
+            $printer->text($settings->business_address . "\n");            
+            $printer->text("Tel: " . $settings->business_phone . "  |  " . $settings->business_email . "\n");
             $printer->text("------------------------------------------------\n");
 
             // ==========================================
@@ -40,7 +48,7 @@ trait PrintTicketTrait
             // ==========================================
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text("Factura: FE-00001234\n");
-            $printer->text("Fecha: 22/11/2025    Hora: 15:42\n");
+            $printer->text("Fecha: " . date('d/m/Y') . "    Hora: " . date('H:i') . "\n");
             $printer->text("Caja: 01      Cajero: Juan Pérez\n");
             $printer->text("Cliente: Consumidor Final\n");
             $printer->text("------------------------------------------------\n");
@@ -51,13 +59,7 @@ trait PrintTicketTrait
             $printer->setEmphasis(true);
             $printer->text("CANT  DESCRIPCION                          TOTAL\n");
             $printer->setEmphasis(false);
-            $printer->text("------------------------------------------------\n");
-
-            $items = [
-                ["cant" => 1, "desc" => "Café Americano", "total" => 2.50],
-                ["cant" => 1, "desc" => "Emparedado de Pollo", "total" => 4.75],
-                ["cant" => 2, "desc" => "Gaseosa 355ml", "total" => 3.00],
-            ];
+            $printer->text("------------------------------------------------\n");            
 
             $ancho = 48; // tu impresora imprime 78 columnas exactas
 

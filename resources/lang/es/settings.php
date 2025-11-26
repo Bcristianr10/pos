@@ -34,4 +34,5 @@ return [
     'business_address'  => 'Dirección de la empresa',
     'business_ruc'  => 'RUC de la empresa',
     'business_dv'  => 'DV de la empresa',
+    'bussiness_printer'  => 'Impresora de la empresa',
 ];

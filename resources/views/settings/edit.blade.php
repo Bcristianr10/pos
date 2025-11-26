@@ -153,6 +153,21 @@
                     </div>
                 </div>
 
+                <div class="col-12 d-flex">
+                    <div class="col-4 form-group">
+                        <label for="bussiness_printer">{{ __('settings.bussiness_printer') }}</label>
+                        <input type="text" name="bussiness_printer"
+                            class="form-control @error('bussiness_printer') is-invalid @enderror" id="bussiness_printer"
+                            placeholder="{{ __('settings.bussiness_printer') }}"
+                            value="{{ old('bussiness_printer', config('settings.bussiness_printer')) }}">
+                        @error('bussiness_printer')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+
                 <button type="submit" class="ml-4 btn btn-primary">{{ __('settings.Change_Setting') }}</button>
             </form>
         </div>

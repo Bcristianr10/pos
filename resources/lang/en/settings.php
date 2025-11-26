@@ -34,6 +34,7 @@ return [
     'business_address'  => 'Bussiness address',
     'business_ruc'  => 'Bussiness Ruc',
     'business_dv'  => 'Bussiness DV',
+    'bussiness_printer'  => 'Bussiness Printer',
 
 
 ];

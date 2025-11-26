@@ -33,9 +33,24 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
     const handleCashPayment = (methodId) => {
         setIsVisibleCashPayment(false);
         const method = paymentMethods.find((p) => p.id == methodId);
-        const amount = Number(inputAmountReceived.current.value);
-
+        const amount = Number(inputAmountReceived.current.value);           
+        if (amount <= 0) {
+            Swal.fire({
+                title: "Error",
+                text: "El monto debe ser mayor a 0",
+                icon: "error",
+            });
+            return;
+        }
         if (amount > method.amount) {
+            Swal.fire({
+                title: "Error",
+                text: "El monto no puede ser mayor al disponible",
+                icon: "error",
+            });
+            return;
+        }
+        if (amount > (totalData.total - paymentMethodsSelectedTotal) && method.id != 1) {
             Swal.fire({
                 title: "Error",
                 text: "El monto no puede ser mayor al disponible",
@@ -108,8 +123,7 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
         // 2. Calcular nuevo amountPayed
         let cashAmountPayed = totalData.total - totalWithoutCash;
         if (cashAmountPayed < 0) cashAmountPayed = 0;
-
-        console.log(cashAmountPayed);
+        
 
         // 3. Evitar loop: solo actualizar si CAMBIÓ
         if (paymentMethodsSelected[1].amountPayed !== cashAmountPayed) {
@@ -119,21 +133,37 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                     ...prev[1],
                     amountPayed: cashAmountPayed,
                 },
-            }));
-            console.log(paymentMethodsSelected);
+            }));            
         }
     }, [paymentMethodsSelected]);
 
-    const handleClickSubmit = () => {
-        console.log(paymentMethodsSelected);
+    const handleClickSubmit = () => {        
         axios
             .post("/admin/orders", {
                 customer_id: state.customer_id,
                 amount: paymentMethodsSelectedTotal,
                 payment_methods: paymentMethodsSelected,
+                print_fe: true,
             })
-            .then((res) => {
-                console.log(res);
+            .then((res) => {                
+                loadCart();
+                closeModal();
+            })
+            .catch((err) => {
+                console.log(err);
+                // Swal.showValidationMessage(err.response.data.message);
+            });
+    };
+
+    const handleClickSubmitNo = () => {        
+        axios
+            .post("/admin/orders", {
+                customer_id: state.customer_id,
+                amount: paymentMethodsSelectedTotal,
+                payment_methods: paymentMethodsSelected,
+                print_fe: false,
+            })
+            .then((res) => {                
                 loadCart();
                 closeModal();
             })
@@ -176,6 +206,7 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                             </button>
                         </div>
                         <div className="col-12 d-flex p-2 h-100">
+                            {/* Details */}
                             <div className="col-6">
                                 <div className="card h-100 p-2 d-flex flex-column justify-content-between">
                                     <div className="d-flex flex-column">
@@ -262,8 +293,8 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-6 d-flex flex-column justify-content-center">
-                                {/* Payment Method */}
+                            {/* Payment Method */}
+                            <div className="col-6 d-flex flex-column justify-content-center">                                
                                 <div className="d-flex justify-content-between align-items-center">
                                     <label htmlFor="">
                                         {translations.amountReceived}
@@ -305,9 +336,9 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                             <button
                                 type="button"
                                 className="btn btn-secondary"
-                                onClick={closeModal}
+                                onClick={handleClickSubmitNo}
                             >
-                                {translations.cancel}
+                                {translations.confirm_pay_no}
                             </button>
                             <button
                                 type="button"
