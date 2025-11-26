@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,6 +33,11 @@ Route::prefix('admin')->middleware(['auth', 'locale'])->group(function () {
     Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
     Route::delete('/cart/delete', [CartController::class, 'delete']);
     Route::delete('/cart/empty', [CartController::class, 'empty']);
+
+
+    Route::get('/ticket', [TicketController::class, 'index'])->name('ticket.index');
+    Route::get('/ticket-example', [TicketController::class, 'buildTicket'])->name('ticket.build');
+
 
     Route::get('/payment-methods', [PaymentMethodController::class, 'getPaymentMethods'])->name('payment-methods.index');
 
