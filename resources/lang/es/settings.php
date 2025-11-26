@@ -28,4 +28,10 @@ return [
     'Warning_quantity'  => 'Cantidad de advertencia',
     'Change_Setting'    => 'Cambiar Configuración',
     'tax_percentage'    => 'Porcentaje de impuesto',
+    'bussiness_name'    => 'Nombre de la empresa',
+    'business_email'    => 'Correo electrónico de la empresa',
+    'business_phone'    => 'Teléfono de la empresa',
+    'business_address'  => 'Dirección de la empresa',
+    'business_ruc'  => 'RUC de la empresa',
+    'business_dv'  => 'DV de la empresa',
 ];

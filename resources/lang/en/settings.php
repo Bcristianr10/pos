@@ -28,4 +28,12 @@ return [
     'warning_quantity'  => 'Warning quantity',
     'Change_Setting'    => 'Change Setting',
     'tax_percentage'    => 'Tax percentage',
+    'bussiness_name'    => 'Bussiness name',
+    'business_email'    => 'Bussiness email',
+    'business_phone'    => 'Bussiness phone',
+    'business_address'  => 'Bussiness address',
+    'business_ruc'  => 'Bussiness Ruc',
+    'business_dv'  => 'Bussiness DV',
+
+
 ];
