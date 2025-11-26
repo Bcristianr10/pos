@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
+use App\Print\PrintTicketTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    use PrintTicketTrait;
     public function index(Request $request)
-    {
+    {        
         $orders = new Order();
         if ($request->start_date) {
             $orders = $orders->where('created_at', '>=', $request->start_date);
@@ -62,6 +64,7 @@ class OrderController extends Controller
             'amount' => $request->amount,
             'user_id' => $request->user()->id,
         ]);
+        $this->finalyTicket($order);
         return 'success';
     }
     public function partialPayment(Request $request)
