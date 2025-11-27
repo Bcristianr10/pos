@@ -8,7 +8,10 @@ class Order extends Model
 {
     protected $fillable = [
         'customer_id',
-        'user_id'
+        'user_id',
+        'customer_name',
+        'customer_ruc',
+        'customer_dv',
     ];
 
     public function items()
@@ -61,5 +64,10 @@ class Order extends Model
     public function formattedReceivedAmount()
     {
         return number_format($this->receivedAmount(), 2);
+    }
+
+    public function cashier()
+    {
+        return $this->belongsTo(User::class);
     }
 }

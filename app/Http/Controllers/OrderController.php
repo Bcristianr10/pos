@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Print\PrintTicketTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,17 +37,25 @@ class OrderController extends Controller
 
     public function store(OrderStoreRequest $request)
     {
+        $settings = Setting::all();
         $order = Order::create([
             'customer_id' => $request->customer_id,
             'user_id' => $request->user()->id,
+            'customer_name' => $request->customer_name,
+            'customer_ruc' => $request->customer_ruc,
+            'customer_dv' => $request->customer_dv,
         ]);
 
         $cart = $request->user()->cart()->get();
         foreach ($cart as $item) {
+            $tax = $item->price * $item->pivot->quantity * $settings->where('key', 'tax_percentage')->first()->value / 100;
+            $price = $item->price * $item->pivot->quantity;
             $order->items()->create([
-                'price' => $item->price * $item->pivot->quantity,
+                'price' => $price,
                 'quantity' => $item->pivot->quantity,
                 'product_id' => $item->id,
+                'tax' => $tax,
+                'total' => ($price + $tax),
             ]);
             $item->quantity = $item->quantity - $item->pivot->quantity;
             $item->save();
@@ -64,9 +73,11 @@ class OrderController extends Controller
             'amount' => $request->amount,
             'user_id' => $request->user()->id,
         ]);
-        if($request->print_fe) {
+        $order->total = $order->items->sum('total');
+        $order->save();
+        // if($request->print_fe) {
             $this->finalyTicket($order);
-        }
+        // }
         return 'success';
     }
     public function partialPayment(Request $request)

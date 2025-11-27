@@ -12,6 +12,9 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
     const [paymentMethodsSelected, setPaymentMethodsSelected] = useState([]);
     const [paymentMethodsSelectedTotal, setPaymentMethodsSelectedTotal] =
         useState(0);
+    const [customerName, setCustomerName] = useState("");
+    const [customerRuc, setCustomerRuc] = useState("");
+    const [customerDv, setCustomerDv] = useState("");
 
     const openModal = () => {
         const modalEl = $("#paymentMethodModal");
@@ -33,7 +36,7 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
     const handleCashPayment = (methodId) => {
         setIsVisibleCashPayment(false);
         const method = paymentMethods.find((p) => p.id == methodId);
-        const amount = Number(inputAmountReceived.current.value);           
+        const amount = Number(inputAmountReceived.current.value);
         if (amount <= 0) {
             Swal.fire({
                 title: "Error",
@@ -50,7 +53,10 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
             });
             return;
         }
-        if (amount > (totalData.total - paymentMethodsSelectedTotal) && method.id != 1) {
+        if (
+            amount > totalData.total - paymentMethodsSelectedTotal &&
+            method.id != 1
+        ) {
             Swal.fire({
                 title: "Error",
                 text: "El monto no puede ser mayor al disponible",
@@ -92,6 +98,9 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
         setCashBack(false);
         setPaymentMethodsSelected({});
         setPaymentMethodsSelectedTotal(0);
+        setCustomerName("");
+        setCustomerRuc("");
+        setCustomerDv("");
     };
 
     // USEEFFECT
@@ -123,7 +132,6 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
         // 2. Calcular nuevo amountPayed
         let cashAmountPayed = totalData.total - totalWithoutCash;
         if (cashAmountPayed < 0) cashAmountPayed = 0;
-        
 
         // 3. Evitar loop: solo actualizar si CAMBIÓ
         if (paymentMethodsSelected[1].amountPayed !== cashAmountPayed) {
@@ -133,19 +141,33 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                     ...prev[1],
                     amountPayed: cashAmountPayed,
                 },
-            }));            
+            }));
         }
     }, [paymentMethodsSelected]);
 
-    const handleClickSubmit = () => {        
+    const handleClickSubmit = () => {
+        const total = Number(totalData.total.toFixed(2));
+        const payed = Number(paymentMethodsSelectedTotal.toFixed(2));
+
+        if (payed < total) {
+            Swal.fire({
+                title: "Error",
+                text: "Debe cancelar en su totalidad el monto de la compra",
+                icon: "error",
+            });
+            return;
+        }
+
         axios
             .post("/admin/orders", {
                 customer_id: state.customer_id,
                 amount: paymentMethodsSelectedTotal,
                 payment_methods: paymentMethodsSelected,
-                print_fe: true,
+                customer_name: customerName,
+                customer_ruc: customerRuc,
+                customer_dv: customerDv,
             })
-            .then((res) => {                
+            .then((res) => {
                 loadCart();
                 closeModal();
             })
@@ -155,7 +177,7 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
             });
     };
 
-    const handleClickSubmitNo = () => {        
+    const handleClickSubmitNo = () => {
         axios
             .post("/admin/orders", {
                 customer_id: state.customer_id,
@@ -163,7 +185,7 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                 payment_methods: paymentMethodsSelected,
                 print_fe: false,
             })
-            .then((res) => {                
+            .then((res) => {
                 loadCart();
                 closeModal();
             })
@@ -294,7 +316,7 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                                 </div>
                             </div>
                             {/* Payment Method */}
-                            <div className="col-6 d-flex flex-column justify-content-center">                                
+                            <div className="col-6 d-flex flex-column justify-content-center">
                                 <div className="d-flex justify-content-between align-items-center">
                                     <label htmlFor="">
                                         {translations.amountReceived}
@@ -329,6 +351,45 @@ function PaymentMethodModal({ translations, state, totalData, loadCart }) {
                                             {p.description}
                                         </button>
                                     ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-12 mt-3 mb-2 p-2">
+                            <div className="row">
+                                <div className="col-4">
+                                    <label>Cliente</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={customerName}
+                                        onChange={(e) =>
+                                            setCustomerName(e.target.value)
+                                        }
+                                    />
+                                </div>
+
+                                <div className="col-4">
+                                    <label>RUC</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={customerRuc}
+                                        onChange={(e) =>
+                                            setCustomerRuc(e.target.value)
+                                        }
+                                    />
+                                </div>
+
+                                <div className="col-4">
+                                    <label>DV</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={customerDv}
+                                        onChange={(e) =>
+                                            setCustomerDv(e.target.value)
+                                        }
+                                    />
                                 </div>
                             </div>
                         </div>

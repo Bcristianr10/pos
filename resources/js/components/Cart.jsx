@@ -210,36 +210,7 @@ class Cart extends Component {
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
     }
-    // handleClickSubmit() {
-    //     // Swal.fire({
-    //     //     title: this.state.translations["received_amount"],
-    //     //     input: "text",
-    //     //     inputValue: this.getTotal(this.state.cart),
-    //     //     cancelButtonText: this.state.translations["cancel_pay"],
-    //     //     showCancelButton: true,
-    //     //     confirmButtonText: this.state.translations["confirm_pay"],
-    //     //     showLoaderOnConfirm: true,
-    //     //     preConfirm: (amount) => {
-    //     //         return axios
-    //     //             .post("/admin/orders", {
-    //     //                 customer_id: this.state.customer_id,
-    //     //                 amount,
-    //     //             })
-    //     //             .then((res) => {
-    //     //                 this.loadCart();
-    //     //                 return res.data;
-    //     //             })
-    //     //             .catch((err) => {
-    //     //                 Swal.showValidationMessage(err.response.data.message);
-    //     //             });
-    //     //     },
-    //     //     allowOutsideClick: () => !Swal.isLoading(),
-    //     // }).then((result) => {
-    //     //     if (result.value) {
-    //     //         //
-    //     //     }
-    //     // });
-    // }
+
     render() {
         const { cart, products, customers, barcode, translations } = this.state;
         this.getTotal(cart);

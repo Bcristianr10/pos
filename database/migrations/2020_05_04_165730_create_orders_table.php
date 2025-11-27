@@ -17,6 +17,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->nullable();
             $table->foreignId('user_id');
+            $table->string('customer_name')->nullable();
+            $table->string('customer_ruc')->nullable();
+            $table->string('customer_dv')->nullable();
+            $table->decimal('total', 8, 2)->default(0);
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');

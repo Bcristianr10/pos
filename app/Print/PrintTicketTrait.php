@@ -7,18 +7,12 @@ use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 
 trait PrintTicketTrait
-{    
-    public function getInfoBussiness()
-    {
-        $settings = Setting::get();
-        return $settings;
-    }
-
+{
     public function finalyTicket($order)
     {
+        $settings = Setting::all();
         try {
-            $settings = $this->getInfoBussiness();
-            $connector = new WindowsPrintConnector($settings->bussiness_printer);
+            $connector = new WindowsPrintConnector($settings->where('key', 'bussiness_printer')->first()->value);
             $printer   = new Printer($connector);
 
             // ==========================================
@@ -27,11 +21,11 @@ trait PrintTicketTrait
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setEmphasis(true);
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-            $printer->text($settings->bussiness_name . "\n");
+            $printer->text("{$settings->where('key', 'bussiness_name')->first()->value}\n");
             $printer->selectPrintMode();
-            $printer->text("RUC: " . $settings->business_ruc . " DV " . $settings->business_dv . "\n");
-            $printer->text($settings->business_address . "\n");            
-            $printer->text("Tel: " . $settings->business_phone . "  |  " . $settings->business_email . "\n");
+            $printer->text("RUC: {$settings->where('key', 'business_ruc')->first()->value} DV {$settings->where('key', 'business_dv')->first()->value}\n");
+            $printer->text("{$settings->where('key', 'business_address')->first()->value}\n");
+            $printer->text("Tel: {$settings->where('key', 'business_phone')->first()->value}  |  {$settings->where('key', 'business_email')->first()->value}\n");
             $printer->text("------------------------------------------------\n");
 
             // ==========================================
@@ -46,11 +40,17 @@ trait PrintTicketTrait
             // ==========================================
             // INFO FACTURA
             // ==========================================
+            $orderNumber = str_pad($order->id, 12, '0', STR_PAD_LEFT);
+            $userName = $order->cashier->name ?? 'General';
+            $customerName = $order->customer_name ?? 'Consumidor Final';
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text("Factura: FE-00001234\n");
+            $printer->text("Factura: FE-{$orderNumber}\n");
             $printer->text("Fecha: " . date('d/m/Y') . "    Hora: " . date('H:i') . "\n");
-            $printer->text("Caja: 01      Cajero: Juan Pérez\n");
-            $printer->text("Cliente: Consumidor Final\n");
+            $printer->text("Caja: 01      Cajero: {$userName}\n");
+            $printer->text("Cliente: {$customerName}\n");
+            if ($order->customer_ruc) {
+                $printer->text("Ruc: {$order->customer_ruc}    Dv: {$order->customer_dv}\n");
+            }
             $printer->text("------------------------------------------------\n");
 
             // ==========================================
@@ -59,7 +59,7 @@ trait PrintTicketTrait
             $printer->setEmphasis(true);
             $printer->text("CANT  DESCRIPCION                          TOTAL\n");
             $printer->setEmphasis(false);
-            $printer->text("------------------------------------------------\n");            
+            $printer->text("------------------------------------------------\n");
 
             $ancho = 48; // tu impresora imprime 78 columnas exactas
 
@@ -89,14 +89,17 @@ trait PrintTicketTrait
             // ==========================================
             // TOTALES
             // ==========================================
+            $subtotal = number_format($order->items->sum('total'), 2);
+            $tax = number_format($order->items->sum('tax'), 2);
+            $total = number_format($order->total, 2);
             $printer->setJustification(Printer::JUSTIFY_RIGHT);
-            $printer->text("SUBTOTAL:          10.25\n");
-            $printer->text("ITBMS (7%):          0.72\n");
+            $printer->text("SUBTOTAL:          " . $subtotal . "\n");
+            $printer->text("ITBMS:          " . $tax . "\n");
             $printer->text("------------------------------------------------\n");
 
             $printer->setEmphasis(true);
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-            $printer->text("TOTAL: 10.97\n");
+            $printer->text("TOTAL: " . $total . "\n");
             $printer->selectPrintMode();
             $printer->setEmphasis(false);
 
@@ -105,8 +108,9 @@ trait PrintTicketTrait
             // ==========================================
             // MÉTODO DE PAGO
             // ==========================================
+            $paymentMethodsToString = implode(', ', $order->paymentMethods->pluck('id','name')->toArray());
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text("Método de Pago: Efectivo\n");
+            $printer->text("Método de Pago: {$paymentMethodsToString}\n");
             $printer->text("Cambio: 0.03\n");
             $printer->text("------------------------------------------------\n");
 
